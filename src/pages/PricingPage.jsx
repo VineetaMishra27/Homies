@@ -21,7 +21,7 @@ const PLAN_DETAILS = [
   },
 ]
 
-export default function PricingPage({ planDur, setPlanDur, user, setAuthModal, showToast }) {
+export default function PricingPage({ planDur, setPlanDur, user, setAuthModal, showToast, setPage, setHasPlan }) {
   const calcPrice = (bhk, dur) => {
     const b = PLANS[bhk]
     const m = dur === 'monthly' ? 1 : dur === '3months' ? 3 : 12
@@ -59,7 +59,7 @@ export default function PricingPage({ planDur, setPlanDur, user, setAuthModal, s
 
     // ── Razorpay Payment ──────────────────────────────────────────────────
     // STEP 1: Add your Razorpay Key ID below (from razorpay.com → Settings → API Keys)
-    const RAZORPAY_KEY_ID = 'rzp_test_SiXOfZnyq4zaXA'  // ← your key goes here
+    const RAZORPAY_KEY_ID = 'PASTE_YOUR_KEY_HERE'   // ← your key goes here
 
 
     const options = {
@@ -77,7 +77,6 @@ export default function PricingPage({ planDur, setPlanDur, user, setAuthModal, s
       handler: async (response) => {
         // Payment successful — save to Supabase
         try {
-          const { supabase } = await import('../supabase')
           await supabase.from('payments').insert({
             owner_id:        user.id,
             owner_email:     user.email,
@@ -89,6 +88,8 @@ export default function PricingPage({ planDur, setPlanDur, user, setAuthModal, s
             created_at:      new Date().toISOString(),
           })
           showToast(`Payment successful! ${planName} plan activated. 🎉`)
+          if (setHasPlan) setHasPlan(true)
+          setTimeout(() => setPage && setPage('list'), 1500)
         } catch {
           showToast(`Payment received (ID: ${response.razorpay_payment_id}). Our team will activate your plan shortly.`)
         }

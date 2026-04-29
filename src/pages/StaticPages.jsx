@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { supabase } from '../supabase'
 import { C, btnPrimary } from '../styles'
 
 const Section = ({ children }) => (
@@ -56,7 +57,6 @@ export function ContactPage({ showToast }) {
     e.preventDefault()
     const form = e.target
     try {
-      const { supabase } = await import('../supabase')
       await supabase.from('support_requests').insert({
         type:    'contact_form',
         name:    form.name.value,
